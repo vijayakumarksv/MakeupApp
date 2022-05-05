@@ -28,9 +28,9 @@ public class ProductSearchRepository {
         return productSearchRepository;
     }
 
-    public MutableLiveData<List<ModelProducts>> getSearchProducts() {
+    public MutableLiveData<List<ModelProducts>> getSearchProducts(String brand, String productType) {
         MutableLiveData<List<ModelProducts>> productsearchMutableLiveData = new MutableLiveData<>();
-        apiService.getProducts().enqueue(new Callback<List<ModelProducts>>() {
+        apiService.searchProducts(brand, productType).enqueue(new Callback<List<ModelProducts>>() {
             @Override
             public void onResponse(Call<List<ModelProducts>> call, Response<List<ModelProducts>> response) {
                 if(response.isSuccessful()) {

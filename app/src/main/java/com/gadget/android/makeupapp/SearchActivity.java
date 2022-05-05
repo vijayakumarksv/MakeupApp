@@ -1,6 +1,7 @@
 package com.gadget.android.makeupapp;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,8 +16,10 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.gadget.android.makeupapp.Utils.AppConstants;
 import com.gadget.android.makeupapp.model.ModelProducts;
 import com.gadget.android.makeupapp.view.adapter.AdapterProductSearch;
+import com.gadget.android.makeupapp.viewmodel.ProductSearchViewModel;
 import com.gadget.android.makeupapp.viewmodel.ProductViewModel;
 
 import java.util.List;
@@ -24,7 +27,7 @@ import java.util.List;
 public class SearchActivity extends AppCompatActivity {
     private ProgressBar progressbar;
     private RecyclerView rvProductView;
-    private ProductViewModel productViewModel;
+    private ProductSearchViewModel productViewModel;
     private AdapterProductSearch adapterProduct;
     private List<ModelProducts> mModelProducts;
 
@@ -41,15 +44,17 @@ public class SearchActivity extends AppCompatActivity {
         rvProductView.setHasFixedSize(true);
         rvProductView.setLayoutManager(new LinearLayoutManager(this));
 
-        productViewModel = ViewModelProviders.of(this).get(ProductViewModel.class);
-        productViewModel.init(this);
-        productViewModel.getProducts().observe(this, productsList -> {
+        String brand = getIntent().getStringExtra(AppConstants.BRAND);
+        String productType = getIntent().getStringExtra(AppConstants.PRODUCT_TYPE);
+        productViewModel = ViewModelProviders.of(SearchActivity.this).get(ProductSearchViewModel.class);
+        productViewModel.init(SearchActivity.this, brand, productType);
+        productViewModel.getProductSearch().observe(SearchActivity.this, productsList -> {
             progressbar.setVisibility(View.VISIBLE);
             if (productsList != null && productsList.size() > 0) {
                 mModelProducts = productsList;
                 progressbar.setVisibility(View.GONE);
                 adapterProduct = new AdapterProductSearch();
-                adapterProduct.productList(this, productsList);
+                adapterProduct.productList(SearchActivity.this, productsList);
                 rvProductView.setAdapter(adapterProduct);
             }
         });

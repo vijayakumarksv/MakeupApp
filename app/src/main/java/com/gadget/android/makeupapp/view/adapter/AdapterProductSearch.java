@@ -6,6 +6,8 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -50,7 +52,7 @@ public class AdapterProductSearch extends RecyclerView.Adapter<AdapterProductSea
             holder.productDesc.setText(pDesc);
 
             holder.productDesc.post(() -> {
-                if (  holder.productDesc.getLayout() != null) {
+                if (holder.productDesc.getLayout() != null) {
                     final int lineCount = holder.productDesc.getLayout().getLineCount();
                     if (lineCount >= 2) {
                         holder.txt_more.setVisibility(View.VISIBLE);
@@ -60,8 +62,8 @@ public class AdapterProductSearch extends RecyclerView.Adapter<AdapterProductSea
                     holder.productDesc.setText(pDesc);
                 }
             });
-            holder.txt_productPrice.setText("Price : "+pPriceSign+" "+pPrice);
-            holder.txt_productBrand.setText(Html.fromHtml("<font><b>" + "Brand : "+ "</b></font>"+pBrand));
+            holder.txt_productPrice.setText("Price : " + pPriceSign + " " + pPrice);
+            holder.txt_productBrand.setText(Html.fromHtml("<font><b>" + "Brand : " + "</b></font>" + pBrand));
             Picasso.get()
                     .load(modelProductsList.get(position).image_link)
                     .placeholder(R.drawable.fashion)
@@ -84,21 +86,24 @@ public class AdapterProductSearch extends RecyclerView.Adapter<AdapterProductSea
     private void alertDialogDescription(ModelProducts modelProducts) {
         Dialog dialog = new Dialog(mContext);
 
-        final View customLayout = ((AppCompatActivity)mContext).getLayoutInflater().inflate(R.layout.custom_alert, null);
+        final View customLayout = ((AppCompatActivity) mContext).getLayoutInflater().inflate(R.layout.custom_alert, null);
         dialog.setContentView(customLayout);
 
         TextView txt_Title = customLayout.findViewById(R.id.txt_Title);
-        TextView txt_description = customLayout.findViewById(R.id.txt_description);
+        //TextView txt_description = customLayout.findViewById(R.id.txt_description);
+        WebView descriptionWebview = customLayout.findViewById(R.id.descriptionWebview);
         LinearLayout layout_close = customLayout.findViewById(R.id.layout_close);
         RelativeLayout rlv_bg = customLayout.findViewById(R.id.rlv_bg);
         LinearLayout layout_bg = customLayout.findViewById(R.id.layout_bg);
 
         txt_Title.setText(modelProducts.name);
-        if(modelProducts.description != null)
-            txt_description.setText(modelProducts.description);
-        else
+        if (modelProducts.description != null) {
+            WebSettings webSettings = descriptionWebview.getSettings();
+            webSettings.setJavaScriptEnabled(true);
+            descriptionWebview.loadData(modelProducts.description, "text/html", "UTF-8");
+        } else {
             dialog.dismiss();
-
+        }
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_rounded_background);
         dialog.show();
         layout_close.setOnClickListener(v -> {
@@ -150,6 +155,7 @@ public class AdapterProductSearch extends RecyclerView.Adapter<AdapterProductSea
             results.values = filteredList;
             return results;
         }
+
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             modelProductsList.clear();

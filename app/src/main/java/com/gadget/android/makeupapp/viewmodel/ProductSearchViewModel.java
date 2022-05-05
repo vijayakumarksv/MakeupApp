@@ -13,15 +13,18 @@ import java.util.List;
 
 public class ProductSearchViewModel extends ViewModel {
     private Context mContext;
+    private String brand, productType;
     private MutableLiveData<List<ModelProducts>> productsMutableLiveData;
     private ProductSearchRepository productSearchRepository;
 
-    public void init(Context context) {
+    public void init(Context context, String brand, String productType) {
         if(productsMutableLiveData != null) {
             this.mContext = context;
+            this.brand = brand;
+            this.productType = productType;
         }
         productSearchRepository  = ProductSearchRepository.getInstance();
-        productsMutableLiveData = productSearchRepository.getSearchProducts();
+        productsMutableLiveData = productSearchRepository.getSearchProducts(brand, productType);
     }
 
     public LiveData<List<ModelProducts>> getProductSearch() {
